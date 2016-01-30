@@ -1,1 +1,10 @@
+# Gradle
+.gradle
+build
+
+# Intellij IDEA
+.idea
+*.iml
+
+# OS X
 .DS_Store
