@@ -5,5 +5,5 @@ import groovy.transform.CompileStatic
 @CompileStatic
 interface FileParser {
 
-    List<StringResource> parse(File file);
+    List<StringResource> parse(File file) throws RuntimeException;
 }

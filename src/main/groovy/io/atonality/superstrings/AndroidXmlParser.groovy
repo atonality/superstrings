@@ -3,8 +3,6 @@ package io.atonality.superstrings
 import groovy.transform.CompileStatic
 import groovy.util.slurpersupport.Node
 
-import java.text.ParseException
-
 @CompileStatic
 class AndroidXmlParser implements FileParser {
 
@@ -12,7 +10,7 @@ class AndroidXmlParser implements FileParser {
     List<StringResource> parse(File file) {
         def xml = new XmlSlurper().parse(file)
         if (!xml) {
-            throw new ParseException("Failed to parse .xml file: ${file.absolutePath}", 0)
+            throw new RuntimeException("Failed to parse .xml file: ${file.absolutePath}")
         }
         def nodes = xml.childNodes().findAll { Node node ->
             node.name() == 'string'
