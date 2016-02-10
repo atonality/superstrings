@@ -3,8 +3,6 @@ package io.atonality.superstrings
 import java.text.NumberFormat
 
 // TODO: add parameters and options
-// TODO: add api key as command line parameter
-
 // -l input language
 // -i target language
 // -e exclude language
@@ -13,9 +11,23 @@ import java.text.NumberFormat
 // -t timeout
 // -d dry run
 def cli = new CliBuilder(usage: "superstrings <filepath>")
+cli.with {
+    h longOpt: 'help', "show usage information"
+    g longOpt: 'google-api-key', args: 1, argName: 'key', 'use google translate with specified API key'
+}
 def options = cli.parse(args);
+if (options.h) {
+    cli.usage()
+    return
+}
 if (options.arguments()?.size() != 1) {
-    cli.usage();
+    cli.usage()
+    return
+}
+def googleApiKey = options.g ? options.g as String : null
+if (!googleApiKey || googleApiKey.isAllWhitespace()) {
+    println "Missing api key. Please supply -g argument\n"
+    cli.usage()
     return
 }
 // ensure file exists
@@ -77,9 +89,6 @@ def translations = resources.collect { StringResource resource ->
 }.flatten() as List<Translation>
 
 // print items to be translated / ask if user is ready to translate
-///
-def googleApiKey = ""
-///
 def translator = new GoogleTranslator(googleApiKey, sourceLanguage)
 def cost = NumberFormat.getCurrencyInstance(Locale.US).format(translator.getEstimatedCost(translations))
 int cachedCount = (resources.size() * targetLanguages.size()) - translations.size()
