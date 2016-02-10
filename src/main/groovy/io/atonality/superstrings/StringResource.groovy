@@ -9,9 +9,9 @@ class StringResource {
     String value
     boolean translatable
     List<TranslationResult> translations = []
+    Map metadata = [:]
 
     transient String sanitizedValue
-    transient Map metadata = [:]
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
