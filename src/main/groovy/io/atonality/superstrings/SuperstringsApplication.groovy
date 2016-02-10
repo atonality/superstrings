@@ -1,12 +1,9 @@
 package io.atonality.superstrings
 
-import com.google.gson.GsonBuilder
-
 import java.text.NumberFormat
 
 // TODO: add parameters and options
 // TODO: add api key as command line parameter
-// TODO: pretty print dates w/ ISO-8601
 
 // -l input language
 // -i target language
@@ -117,11 +114,6 @@ println "***********************************************************************
 int successCount = 0
 int failedCount = 0
 
-def gson = new GsonBuilder()
-    .setPrettyPrinting()
-    .registerTypeAdapter(Date.class, new DateSerializer())
-    .create()
-
 for (int i = 0; i < 4; i++) {
     def item = translations[i]
     println "Translating text ${sourceLanguage}->${item.targetLanguage}: ${item.resource.value}"
@@ -138,7 +130,7 @@ for (int i = 0; i < 4; i++) {
         }
         resourceToUpdate.translations << translation
         try {
-            def json = gson.toJson(translatedResources)
+            def json = SerializationUtil.newGsonInstance().toJson(translatedResources)
             cacheFile.withWriter { it << json }
             println "Cache file updated successfully"
         } catch (IOException ex) {
