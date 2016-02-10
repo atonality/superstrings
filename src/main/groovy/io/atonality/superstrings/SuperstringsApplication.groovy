@@ -6,8 +6,7 @@ import java.text.NumberFormat
 
 // TODO: add parameters and options
 // TODO: add api key as command line parameter
-// TODO: handle translatable attribute
-// TODO: add and handle translatableValue to Android .xml resources
+// TODO: pretty print dates w/ ISO-8601
 
 // -l input language
 // -i target language
@@ -38,6 +37,8 @@ try {
     ex.printStackTrace()
     return
 }
+resources.removeAll { !it.translatable }
+
 // parse cache file
 def cacheFile = new File(file.parentFile, "${file.name}.superstrings")
 if (cacheFile.exists() && cacheFile.canRead()) {

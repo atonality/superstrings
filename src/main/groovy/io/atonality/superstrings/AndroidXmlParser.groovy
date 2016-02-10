@@ -21,7 +21,13 @@ class AndroidXmlParser implements FileParser {
             if (id?.isEmpty() || value?.isEmpty()) {
                 return null
             }
-            def translatable = node.attributes()["translatable"] as Boolean ?: true
+            def translatableAttr = node.attributes()['translatable'] as String
+            boolean translatable = translatableAttr ? Boolean.valueOf(translatableAttr) : true
+
+            def valueAttr = node.attributes()[SuperstringsNamespace.ValueAttr] as String
+            if (valueAttr != null && !valueAttr.isEmpty()) {
+                value = valueAttr
+            }
             return new StringResource(id: id, value: value, translatable: translatable)
         } as List<StringResource>
         resources.removeAll { it == null }
