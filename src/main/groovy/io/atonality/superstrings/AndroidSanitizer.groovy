@@ -3,29 +3,29 @@ package io.atonality.superstrings
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class AndroidSanitizer implements Sanitizer {
+class AndroidSanitizer extends Sanitizer {
 
     @Override
-    void sanitize(StringResource resource) {
-        String value = resource.value
+    String sanitize(StringResource resource) {
+        String value = super.sanitize(resource)
         boolean cdata = resource.metadata['cdata'] as Boolean
         if (!cdata) {
-            value = resource.value.replace("\\'", "'")
+            value = value.replace("\\'", "'")
             value = value.replace('\\"', '"')
         }
-        resource.sanitizedValue = value
+        return value
     }
 
     @Override
-    void rebuild(TranslationResult result) {
-        String value = result.translatedValue
+    String rebuild(TranslationResult result) {
+        String value = super.rebuild(result)
         boolean cdata = result.resource.metadata['cdata'] as Boolean
         if (cdata) {
             value = "<![CDATA[${value}]]>"
         } else {
-            value = result.translatedValue.replace("'", "\\'")
+            value = value.replace("'", "\\'")
             value = value.replace('"', '\\"')
         }
-        result.translatedValue = value
+        return value
     }
 }

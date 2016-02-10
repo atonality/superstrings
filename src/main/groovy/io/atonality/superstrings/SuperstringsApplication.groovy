@@ -143,13 +143,13 @@ for (int i = 0; i < translations.size(); i++) {
     def item = translations[i]
     println "Translating text ${sourceLanguage}->${item.targetLanguage}: ${item.resource.value}"
 
-    sanitizer.sanitize(item.resource)
+    item.resource.sanitizedValue = sanitizer.sanitize(item.resource)
     println "\tSanitized text: ${item.resource.sanitizedValue}"
     try {
         def translation = translator.translate(item)
         println "Translation succeeded: ${translation.translatedValue}"
 
-        sanitizer.rebuild(translation)
+        translation.translatedValue = sanitizer.rebuild(translation)
         println "\tRebuilt value: ${translation.translatedValue}"
         successCount++
 
