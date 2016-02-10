@@ -33,8 +33,8 @@ class GoogleTranslator implements Translator {
     TranslationResult translate(Translation translation) {
         def url = HttpUrl.parse(API_ENDPOINT).newBuilder()
                 .addQueryParameter("key", apiKey)
-                .addQueryParameter("source", sourceLanguage.googleCode)
-                .addQueryParameter("target", translation.targetLanguage.googleCode)
+                .addQueryParameter("source", sourceLanguage.isoCode)
+                .addQueryParameter("target", translation.targetLanguage.isoCode)
                 .addQueryParameter("q", translation.resource.sanitizedValue)
                 .build()
         def request = new Request.Builder().url(url).build()

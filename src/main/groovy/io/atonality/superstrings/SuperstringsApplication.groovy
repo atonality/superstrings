@@ -70,7 +70,7 @@ if (cacheFile.exists() && cacheFile.canRead()) {
 }
 long timeoutMs = 1000L * 60L * 60L * 24L * 90L // 90 days
 def sourceLanguage = Language.English
-def targetLanguages = Language.values().toList()
+def targetLanguages = Language.values().toList().toSet()
 targetLanguages.remove(sourceLanguage)
 
 // remove stale translations
@@ -171,3 +171,24 @@ println "* Finished Translating                                                 
 println "********************************************************************************"
 println "${successCount}/${translations.size()} succeeded"
 println "${failedCount}/${translations.size()} failed"
+
+println()
+println "********************************************************************************"
+println "* Start Writing Output Files                                                   *"
+println "********************************************************************************"
+
+def output = new AndroidOutput()
+targetLanguages.each { Language targetLanguage ->
+    println("Write output file for language: ${targetLanguage}")
+    try {
+        def result = output.writeTranslations(translatedResources, targetLanguage, file)
+        def outputFile = result.get(0) as File
+        def outputResources = result.get(1) as List<StringResource>
+        println("Successfully wrote ${outputResources.size()} resources to file: ${outputFile.absolutePath}")
+    } catch (IOException ex) {
+        println('Failed to write output file')
+        ex.printStackTrace()
+    }
+    println()
+}
+println('\nFinished')

@@ -15,7 +15,8 @@ class StringResource {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        return new StringResource(id: this.id, value: this.value, translatable: this.translatable)
+        return new StringResource(id: this.id, value: this.value,
+                metadata:this.metadata, translatable: this.translatable)
     }
 
     @Override
