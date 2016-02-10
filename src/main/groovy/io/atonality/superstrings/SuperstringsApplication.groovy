@@ -3,6 +3,8 @@ package io.atonality.superstrings
 import java.text.NumberFormat
 
 // TODO: parse superstrings namespace in .xml properly
+// TODO: handle proper names inside resources
+// TODO: handle format string specifiers inside resources
 
 // TODO: add parameters and options
 // -l input language
@@ -51,7 +53,15 @@ try {
 resources.removeAll { !it.translatable }
 
 // parse cache file
-def cacheFile = new File(file.parentFile, "${file.name}.superstrings")
+def output = new AndroidOutput()
+
+File cacheFile
+if (output != null) {
+    cacheFile = output.getCacheFile(file)
+} else {
+    cacheFile = new File(file.parentFile, "${file.name}.superstrings")
+}
+cacheFile.getParentFile().mkdirs()
 if (cacheFile.exists() && cacheFile.canRead()) {
     try {
         def cachedResources = new JsonParser().parse(cacheFile)
@@ -177,7 +187,6 @@ println "***********************************************************************
 println "* Start Writing Output Files                                                   *"
 println "********************************************************************************"
 
-def output = new AndroidOutput()
 targetLanguages.each { Language targetLanguage ->
     println("Write output file for language: ${targetLanguage}")
     try {

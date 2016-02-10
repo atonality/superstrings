@@ -4,6 +4,22 @@ import groovy.xml.MarkupBuilder
 
 class AndroidOutput {
 
+    File getCacheFile(File inputFile) {
+        File file = inputFile
+        while (file.getName() != 'src') {
+            file = file.getParentFile()
+            if (file == null) {
+                throw new RuntimeException('Unable to find "src" parent directory of strings.xml file')
+            }
+        }
+        // after below call, file points to the main project directory
+        file = file.getParentFile()
+
+        // build .superstrings subdirectory
+        file = new File(file, '.superstrings')
+        return new File(file, "${inputFile.name}.superstrings")
+    }
+
     Tuple writeTranslations(Set<StringResource> translatedResources, Language targetLanguage, File inputFile) throws IOException {
         // filter and sort resources
         translatedResources.removeAll { StringResource resource ->
