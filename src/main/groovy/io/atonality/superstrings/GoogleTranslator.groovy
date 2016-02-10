@@ -27,6 +27,9 @@ class GoogleTranslator implements Translator {
 
     @Override
     double getEstimatedCost(List<Translation> translations) {
+        if (translations?.isEmpty()) {
+            return 0
+        }
         long characters = translations.sum { Translation item ->
             item.resource.value.length()
         } as long
