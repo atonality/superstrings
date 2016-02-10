@@ -65,10 +65,12 @@ class Sanitizer {
     }
 
     protected String buildPositionalSpecifier(int index) {
-        "#${index + 1}"
+        "(^${index + 1})"
     }
 
     protected String buildPositionalSpecifierRegex(int index) {
-        "#\\s*${index + 1}"
+        def leftBracket = '[\\(\\uff08]'
+        def rightBracket = '[\\)\\uff09]'
+        "${leftBracket}\\s*\\^\\s*${index + 1}\\s*${rightBracket}"
     }
 }

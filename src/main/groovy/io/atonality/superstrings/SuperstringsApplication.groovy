@@ -4,7 +4,6 @@ import java.text.NumberFormat
 
 // TODO: parse superstrings namespace in .xml properly
 // TODO: handle proper names inside resources
-// TODO: handle format string specifiers inside resources
 // TODO: package as jar / runnable application
 // TODO: documentation
 
