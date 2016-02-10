@@ -10,6 +10,9 @@ class StringResource {
     boolean translatable
     List<TranslationResult> translations = []
 
+    transient String sanitizedValue
+    transient Map metadata = [:]
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return new StringResource(id: this.id, value: this.value, translatable: this.translatable)

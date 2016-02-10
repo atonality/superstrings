@@ -35,7 +35,7 @@ class GoogleTranslator implements Translator {
                 .addQueryParameter("key", apiKey)
                 .addQueryParameter("source", sourceLanguage.googleCode)
                 .addQueryParameter("target", translation.targetLanguage.googleCode)
-                .addQueryParameter("q", translation.resource.value)
+                .addQueryParameter("q", translation.resource.sanitizedValue)
                 .build()
         def request = new Request.Builder().url(url).build()
         def response = client.newCall(request).execute()
@@ -48,6 +48,7 @@ class GoogleTranslator implements Translator {
         }
         return new TranslationResult(language: translation.targetLanguage,
                 translatedValue: translatedValue,
-                dateTranslated: new Date())
+                dateTranslated: new Date(),
+                resource: translation.resource)
     }
 }

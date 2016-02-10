@@ -2,6 +2,8 @@ package io.atonality.superstrings
 
 import java.text.NumberFormat
 
+// TODO: parse superstrings namespace in .xml properly
+
 // TODO: add parameters and options
 // -l input language
 // -i target language
@@ -90,6 +92,8 @@ def translations = resources.collect { StringResource resource ->
 
 // print items to be translated / ask if user is ready to translate
 def translator = new GoogleTranslator(googleApiKey, sourceLanguage)
+def sanitizer = new AndroidSanitizer()
+
 def cost = NumberFormat.getCurrencyInstance(Locale.US).format(translator.getEstimatedCost(translations))
 int cachedCount = (resources.size() * targetLanguages.size()) - translations.size()
 
@@ -123,13 +127,19 @@ println "***********************************************************************
 int successCount = 0
 int failedCount = 0
 
-for (int i = 0; i < 4; i++) {
+for (int i = 0; i < translations.size(); i++) {
     def item = translations[i]
     println "Translating text ${sourceLanguage}->${item.targetLanguage}: ${item.resource.value}"
+
+    sanitizer.sanitize(item.resource)
+    println "\tSanitized text: ${item.resource.sanitizedValue}"
     try {
         def translation = translator.translate(item)
-        successCount++
         println "Translation succeeded: ${translation.translatedValue}"
+
+        sanitizer.rebuild(translation)
+        println "\tRebuilt value: ${translation.translatedValue}"
+        successCount++
 
         // cache results
         def resourceToUpdate = translatedResources.find { it == item.resource }
