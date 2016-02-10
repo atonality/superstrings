@@ -5,20 +5,24 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-// TODO: handle quota of 10,000 characters / 100 seconds
 class GoogleTranslator implements Translator {
 
-    static final double COST_PER_CHARACTER = 20.0 / 1000000
     static final String API_ENDPOINT = "https://www.googleapis.com/language/translate/v2"
+
+    static final int QUOTA_CHARACTER_COUNT = 10000
+    static final long QUOTA_TIMEOUT_MS = 100L * 1000L
+    static final double COST_PER_CHARACTER = 20.0 / 1000000
 
     String apiKey
     Language sourceLanguage
     OkHttpClient client
+    Set<TranslationResult> results
 
     public GoogleTranslator(String apiKey, Language sourceLanguage) {
         this.apiKey = apiKey
         this.sourceLanguage = sourceLanguage
         this.client = new OkHttpClient.Builder().build()
+        this.results = []
     }
 
     @Override
@@ -31,6 +35,12 @@ class GoogleTranslator implements Translator {
 
     @Override
     TranslationResult translate(Translation translation) {
+        while (checkQuotaExceeded()) {
+            long seconds = QUOTA_TIMEOUT_MS / 1000L
+            println("Quota exceeded (${QUOTA_CHARACTER_COUNT} characters per ${seconds} seconds)")
+            println("Sleeping for 5 seconds...\n")
+            sleep(5000)
+        }
         def url = HttpUrl.parse(API_ENDPOINT).newBuilder()
                 .addQueryParameter("key", apiKey)
                 .addQueryParameter("source", sourceLanguage.isoCode)
@@ -46,9 +56,25 @@ class GoogleTranslator implements Translator {
         if (!translatedValue) {
             throw new IOException("Unable to parse translatedText field from result JSON")
         }
-        return new TranslationResult(language: translation.targetLanguage,
+        def result = new TranslationResult(language: translation.targetLanguage,
                 translatedValue: translatedValue,
                 dateTranslated: new Date(),
                 resource: translation.resource)
+        results << result
+        return result
+    }
+
+    protected boolean checkQuotaExceeded() {
+        def relevantTranslations = results.findAll { TranslationResult result ->
+            long elapsed = System.currentTimeMillis() - result.dateTranslated.time
+            return elapsed < QUOTA_TIMEOUT_MS
+        }
+        if (relevantTranslations?.isEmpty()) {
+            return false
+        }
+        long characterCount = relevantTranslations.sum { TranslationResult result ->
+            result.resource.sanitizedValue.length()
+        } as long
+        return characterCount >= (QUOTA_CHARACTER_COUNT * 0.90)
     }
 }
