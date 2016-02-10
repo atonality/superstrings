@@ -3,7 +3,7 @@ package io.atonality.superstrings
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class AndroidSanitizer extends Sanitizer {
+class AndroidSanitizer extends JavaSanitizer {
 
     @Override
     String sanitize(StringResource resource) {

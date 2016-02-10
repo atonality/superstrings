@@ -7,23 +7,17 @@ import java.util.regex.Pattern
 @CompileStatic
 class Sanitizer {
 
-    // from java.util.Formatter.class
-    // %[argument_index$][flags][width][.precision][t]conversion
-    static final String FMT_SPECIFIER_REGEX = '%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])'
-
-    Pattern fmtSpecifierPattern
-
-    Sanitizer() {
-        fmtSpecifierPattern = Pattern.compile(FMT_SPECIFIER_REGEX)
-    }
-
     String sanitize(StringResource resource) {
         String value = resource.value
 
-        def fmtSpecifiers = value.findAll(fmtSpecifierPattern)
-        value = sanitizePositionalArguments(resource, value, fmtSpecifiers)
+        def arguments = getPositionalArguments(resource)
+        value = sanitizePositionalArguments(resource, value, arguments)
 
         return value
+    }
+
+    List<String> getPositionalArguments(StringResource resource) {
+        return []
     }
 
     String sanitizePositionalArguments(StringResource resource, String value, List<String> arguments) {
