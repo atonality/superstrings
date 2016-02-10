@@ -5,6 +5,8 @@ import java.text.NumberFormat
 // TODO: parse superstrings namespace in .xml properly
 // TODO: handle proper names inside resources
 // TODO: handle format string specifiers inside resources
+// TODO: package as jar / runnable application
+// TODO: documentation
 
 // TODO: add parameters and options
 // -l input language
@@ -159,7 +161,10 @@ for (int i = 0; i < translations.size(); i++) {
         }
         resourceToUpdate.translations << translation
         try {
-            def json = SerializationUtil.newGsonInstance().toJson(translatedResources)
+            def sortedOutput = translatedResources.sort() { StringResource left, StringResource right ->
+                left.id <=> right.id
+            }
+            def json = SerializationUtil.newGsonInstance().toJson(sortedOutput)
             cacheFile.withWriter { it << json }
             println "Cache file updated successfully"
         } catch (IOException ex) {

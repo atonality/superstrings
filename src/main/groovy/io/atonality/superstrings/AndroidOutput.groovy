@@ -26,7 +26,7 @@ class AndroidOutput {
             def translation = resource.translations.find { it.language == targetLanguage }
             return translation == null
         }
-        translatedResources.sort { StringResource left, StringResource right ->
+        translatedResources = translatedResources.sort { StringResource left, StringResource right ->
             left.id <=> right.id
         }
 
