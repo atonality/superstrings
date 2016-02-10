@@ -34,6 +34,7 @@ class AndroidOutput {
         def inValuesDir = inputFile.getParentFile()
         def outValuesDir = new File(inValuesDir.getParentFile(), "${inValuesDir.getName()}-${targetLanguage.isoCode}")
         def outputFile = new File(outValuesDir, inputFile.getName())
+        outputFile.getParentFile().mkdirs()
 
         // write xml to output file
         def xml = new MarkupBuilder(outputFile.newWriter('utf-8'))
