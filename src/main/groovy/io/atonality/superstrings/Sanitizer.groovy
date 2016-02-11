@@ -15,10 +15,19 @@ class Sanitizer {
 
     String sanitize(StringResource resource) {
         String value = resource.value
+        value = replaceWithMapping(value)
 
         def arguments = getPositionalArguments(resource)
         value = sanitizePositionalArguments(resource, value, arguments)
 
+        return value
+    }
+
+    String replaceWithMapping(String value) {
+        metadata.mapping.each { Map.Entry<String, String> entry ->
+            def pattern = Pattern.compile(entry.key, Pattern.CASE_INSENSITIVE)
+            value = value.replaceAll(pattern, entry.value)
+        }
         return value
     }
 

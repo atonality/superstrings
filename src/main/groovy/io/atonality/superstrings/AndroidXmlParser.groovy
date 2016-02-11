@@ -14,9 +14,14 @@ class AndroidXmlParser implements FileParser {
         if (!xml) {
             throw new RuntimeException("Failed to parse .xml file: ${file.absolutePath}")
         }
-        def properNamesAttr = xml.getProperty("@superstrings:properNames") as String
+        def properNamesAttr = xml.getProperty('@superstrings:properNames') as String
         if (properNamesAttr != null) {
             metadata.properNames += parseProperNames(properNamesAttr)
+        }
+
+        def mappingAttr = xml.getProperty('@superstrings:mapping') as String
+        if (mappingAttr != null) {
+            metadata.mapping += parseMapping(mappingAttr)
         }
         return metadata
     }
@@ -66,5 +71,16 @@ class AndroidXmlParser implements FileParser {
     protected Set<String> parseProperNames(String properNamesAttr) {
         properNamesAttr.split('\\|').toList().collect() { it.trim() }
                 .findAll { !it.isEmpty() }.toSet()
+    }
+
+    protected Map<String, String> parseMapping(String mappingAttr) {
+        def result = [:]
+        mappingAttr.split('\\|').toList().each {
+            def attrs = it.split(':')
+            if (attrs.length == 2) {
+                result[attrs[0]] = attrs[1]
+            }
+        }
+        return result
     }
 }
