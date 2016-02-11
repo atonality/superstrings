@@ -4,6 +4,8 @@ import groovy.transform.CompileStatic
 
 import java.util.regex.Pattern
 
+// TODO: matching case of first character may fail if the first character is a "?" or other punctuation char
+// TODO: replace w/ mapping does not replace w/ proper case
 @CompileStatic
 class Sanitizer {
 
@@ -62,6 +64,18 @@ class Sanitizer {
 
     String rebuild(TranslationResult result) throws IOException {
         def value = rebuildPositionalArguments(result.resource, result.translatedValue)
+
+        // update case of first character
+        if (!value.isEmpty() && !result.resource.value.isEmpty()) {
+            char pre = result.resource.value.charAt(0)
+            char post = value.charAt(0)
+
+            if (Character.isUpperCase(pre) && !Character.isUpperCase(post)) {
+                value = value.replaceFirst(post as String, post.toUpperCase() as String)
+            } else if (Character.isLowerCase(pre) && !Character.isLowerCase(pre)) {
+                value = value.replaceFirst(post as String, post.toLowerCase() as String)
+            }
+        }
         return value
     }
 
