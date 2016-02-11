@@ -36,12 +36,12 @@ class Sanitizer {
         return value
     }
 
-    String rebuild(TranslationResult result) {
+    String rebuild(TranslationResult result) throws IOException {
         def value = rebuildPositionalArguments(result.resource, result.translatedValue)
         return value
     }
 
-    String rebuildPositionalArguments(StringResource resource, String value) {
+    String rebuildPositionalArguments(StringResource resource, String value) throws IOException {
         def arguments = resource.metadata['args'] as List<String>
 
         // intellij is showing an unnecessary error when using eachWithIndex; therefore,
@@ -52,8 +52,7 @@ class Sanitizer {
             def pattern = Pattern.compile(buildPositionalSpecifierRegex(i))
             String specifier = value.find(pattern)
             if (!specifier) {
-                println "WARNING: Failed to find positional specifier ${pattern.toString()} in translated string: ${value}"
-                continue
+                throw new IOException("Failed to find positional specifier ${pattern.toString()} in translated string: ${value}")
             }
             int pos = value.indexOf(specifier)
             def prefix = value.substring(0, pos)

@@ -17,7 +17,7 @@ class AndroidSanitizer extends JavaSanitizer {
     }
 
     @Override
-    String rebuild(TranslationResult result) {
+    String rebuild(TranslationResult result) throws IOException {
         String value = super.rebuild(result)
         boolean cdata = result.resource.metadata['cdata'] as Boolean
         if (cdata) {
