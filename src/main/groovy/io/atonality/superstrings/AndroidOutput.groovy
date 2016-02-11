@@ -22,11 +22,11 @@ class AndroidOutput {
 
     Tuple writeTranslations(Set<StringResource> translatedResources, Language targetLanguage, File inputFile) throws IOException {
         // filter and sort resources
-        translatedResources.removeAll { StringResource resource ->
+        translatedResources = translatedResources.findAll { StringResource resource ->
             def translation = resource.translations.find { it.language == targetLanguage }
-            return translation == null
+            return translation != null
         }
-        translatedResources = translatedResources.sort { StringResource left, StringResource right ->
+        .sort { StringResource left, StringResource right ->
             left.id <=> right.id
         }
 
