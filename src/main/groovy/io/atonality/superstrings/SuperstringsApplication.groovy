@@ -3,7 +3,6 @@ package io.atonality.superstrings
 import java.text.NumberFormat
 
 // TODO: parse superstrings namespace in .xml properly
-// TODO: handle proper names inside resources
 // TODO: package as jar / runnable application
 // TODO: documentation
 

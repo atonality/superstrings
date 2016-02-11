@@ -15,6 +15,12 @@ class AndroidXmlParser implements FileParser {
         def nodes = xml.childNodes().findAll { Node node ->
             node.name() == 'string'
         } as List<Node>
+
+        def sharedProperNames = [] as Set<String>
+        def properNamesAttr = xml.getProperty("@superstrings:properNames") as String
+        if (properNamesAttr != null) {
+            sharedProperNames += parseProperNames(properNamesAttr)
+        }
         def resources = nodes.collect { Node node ->
             def id = node.attributes()['name'] as String
             def value = node.text()
@@ -34,9 +40,22 @@ class AndroidXmlParser implements FileParser {
             boolean cdata = cdataAttr ? Boolean.valueOf(cdataAttr) : false
             resource.metadata['cdata'] = cdata
 
+            def properNames = [] as Set<String>
+            properNamesAttr = node.attributes()[SuperstringsNamespace.ProperNamesAttr] as String
+            if (properNamesAttr != null) {
+                properNames += parseProperNames(properNamesAttr)
+            }
+            properNames += sharedProperNames
+            resource.metadata['properNames'] = properNames
+
             return resource
         } as List<StringResource>
         resources.removeAll { it == null }
         return resources
+    }
+
+    protected Set<String> parseProperNames(String properNamesAttr) {
+        properNamesAttr.split('\\|').toList().collect() { it.trim() }
+                .findAll { !it.isEmpty() }.toSet()
     }
 }

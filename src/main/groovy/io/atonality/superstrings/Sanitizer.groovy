@@ -17,7 +17,13 @@ class Sanitizer {
     }
 
     List<String> getPositionalArguments(StringResource resource) {
-        return []
+        def result = [] as List<String>
+        def properNames = (resource.metadata['properNames'] ?: []) as Set<String>
+        properNames.each { String name ->
+            def pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE)
+            result += resource.value.findAll(pattern)
+        }
+        return result
     }
 
     String sanitizePositionalArguments(StringResource resource, String value, List<String> arguments) {
