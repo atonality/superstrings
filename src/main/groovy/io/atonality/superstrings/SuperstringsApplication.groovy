@@ -5,6 +5,7 @@ import java.text.NumberFormat
 // TODO: parse superstrings namespace in .xml properly
 // TODO: package as jar / runnable application
 // TODO: documentation
+// TODO: add invaliation commands: by id, by language or all
 
 // TODO: add parameters and options
 // -l input language
@@ -161,6 +162,11 @@ for (int i = 0; i < translations.size(); i++) {
         try {
             def sortedOutput = translatedResources.sort() { StringResource left, StringResource right ->
                 left.id <=> right.id
+            }
+            sortedOutput.each {
+                it.translations.sort(true) { TranslationResult left, TranslationResult right ->
+                    left.language <=> right.language
+                }
             }
             def json = SerializationUtil.newGsonInstance().toJson(sortedOutput)
             cacheFile.withWriter { it << json }
