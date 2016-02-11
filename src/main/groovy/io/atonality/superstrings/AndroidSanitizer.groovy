@@ -5,6 +5,10 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class AndroidSanitizer extends JavaSanitizer {
 
+    def AndroidSanitizer(SuperstringsMetadata metadata) {
+        super(metadata)
+    }
+
     @Override
     String sanitize(StringResource resource) {
         String value = super.sanitize(resource)

@@ -41,17 +41,29 @@ if (!(file.exists() && file.canRead())) {
     println "Unable to access file: ${file.absolutePath}"
     return
 }
-// parse file
+// parse resources
+def parser = new AndroidXmlParser()
+
 List<StringResource> resources
 Set<StringResource> translatedResources = []
 try {
-    resources = new AndroidXmlParser().parse(file)
+    resources = parser.parse(file)
 } catch (RuntimeException ex) {
-    println "Unable to parse file as Android .xml: ${file.absolutePath}"
+    println "Unable to parse resources from Android .xml file: ${file.absolutePath}"
     ex.printStackTrace()
     return
 }
 resources.removeAll { !it.translatable }
+
+// parse metadata
+def metadata = new SuperstringsMetadata()
+try {
+    metadata = parser.parseMetadata(file)
+} catch (RuntimeException ex) {
+    println "Unable to parse metadata from Android .xml file: ${file.absolutePath}"
+    ex.printStackTrace()
+    return
+}
 
 // parse cache file
 def output = new AndroidOutput()
@@ -103,7 +115,7 @@ def translations = resources.collect { StringResource resource ->
 
 // print items to be translated / ask if user is ready to translate
 def translator = new GoogleTranslator(googleApiKey, sourceLanguage)
-def sanitizer = new AndroidSanitizer()
+def sanitizer = new AndroidSanitizer(metadata)
 
 def cost = NumberFormat.getCurrencyInstance(Locale.US).format(translator.getEstimatedCost(translations))
 int cachedCount = (resources.size() * targetLanguages.size()) - translations.size()

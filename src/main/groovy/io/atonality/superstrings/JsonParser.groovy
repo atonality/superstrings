@@ -11,4 +11,10 @@ class JsonParser implements FileParser {
         def token = new TypeToken<List<StringResource>>(){}.getType()
         SerializationUtil.newGsonInstance().fromJson(file.text, token) as List<StringResource>
     }
+
+    // unused
+    @Override
+    SuperstringsMetadata parseMetadata(File file) throws RuntimeException {
+        return new SuperstringsMetadata()
+    }
 }

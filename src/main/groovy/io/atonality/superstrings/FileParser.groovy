@@ -6,4 +6,5 @@ import groovy.transform.CompileStatic
 interface FileParser {
 
     List<StringResource> parse(File file) throws RuntimeException;
+    SuperstringsMetadata parseMetadata(File file) throws RuntimeException;
 }

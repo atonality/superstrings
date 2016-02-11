@@ -13,7 +13,8 @@ class JavaSanitizer extends Sanitizer {
 
     Pattern fmtSpecifierPattern
 
-    JavaSanitizer() {
+    JavaSanitizer(SuperstringsMetadata metadata) {
+        super(metadata)
         fmtSpecifierPattern = Pattern.compile(FMT_SPECIFIER_REGEX)
     }
 

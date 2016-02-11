@@ -7,6 +7,21 @@ import groovy.util.slurpersupport.Node
 class AndroidXmlParser implements FileParser {
 
     @Override
+    SuperstringsMetadata parseMetadata(File file) throws RuntimeException {
+        def metadata = new SuperstringsMetadata()
+
+        def xml = new XmlSlurper().parse(file)
+        if (!xml) {
+            throw new RuntimeException("Failed to parse .xml file: ${file.absolutePath}")
+        }
+        def properNamesAttr = xml.getProperty("@superstrings:properNames") as String
+        if (properNamesAttr != null) {
+            metadata.properNames += parseProperNames(properNamesAttr)
+        }
+        return metadata
+    }
+
+    @Override
     List<StringResource> parse(File file) {
         def xml = new XmlSlurper().parse(file)
         if (!xml) {
@@ -16,11 +31,6 @@ class AndroidXmlParser implements FileParser {
             node.name() == 'string'
         } as List<Node>
 
-        def sharedProperNames = [] as Set<String>
-        def properNamesAttr = xml.getProperty("@superstrings:properNames") as String
-        if (properNamesAttr != null) {
-            sharedProperNames += parseProperNames(properNamesAttr)
-        }
         def resources = nodes.collect { Node node ->
             def id = node.attributes()['name'] as String
             def value = node.text()
@@ -41,11 +51,10 @@ class AndroidXmlParser implements FileParser {
             resource.metadata['cdata'] = cdata
 
             def properNames = [] as Set<String>
-            properNamesAttr = node.attributes()[SuperstringsNamespace.ProperNamesAttr] as String
+            def properNamesAttr = node.attributes()[SuperstringsNamespace.ProperNamesAttr] as String
             if (properNamesAttr != null) {
                 properNames += parseProperNames(properNamesAttr)
             }
-            properNames += sharedProperNames
             resource.metadata['properNames'] = properNames
 
             return resource

@@ -7,6 +7,12 @@ import java.util.regex.Pattern
 @CompileStatic
 class Sanitizer {
 
+    SuperstringsMetadata metadata
+
+    Sanitizer(SuperstringsMetadata metadata) {
+        this.metadata = metadata
+    }
+
     String sanitize(StringResource resource) {
         String value = resource.value
 
@@ -17,8 +23,11 @@ class Sanitizer {
     }
 
     List<String> getPositionalArguments(StringResource resource) {
+        def properNames = [] as Set<String>
+        properNames += metadata.properNames
+        properNames += (resource.metadata['properNames'] ?: []) as Set<String>
+
         def result = [] as List<String>
-        def properNames = (resource.metadata['properNames'] ?: []) as Set<String>
         properNames.each { String name ->
             def pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE)
             result += resource.value.findAll(pattern)
