@@ -27,7 +27,7 @@ class Sanitizer {
 
     String replaceWithMapping(String value) {
         metadata.mapping.each { Map.Entry<String, String> entry ->
-            def pattern = Pattern.compile(entry.key, Pattern.CASE_INSENSITIVE)
+            def pattern = Pattern.compile("\\b${entry.key}\\b", Pattern.CASE_INSENSITIVE)
             value = value.replaceAll(pattern, entry.value)
         }
         return value
@@ -40,7 +40,7 @@ class Sanitizer {
 
         def result = [] as List<String>
         properNames.each { String name ->
-            def pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE)
+            def pattern = Pattern.compile("\\b${name}\\b", Pattern.CASE_INSENSITIVE)
             result += resource.value.findAll(pattern)
         }
         return result
