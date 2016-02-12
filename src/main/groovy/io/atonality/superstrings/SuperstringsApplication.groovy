@@ -18,6 +18,7 @@ import java.text.NumberFormat
 def cli = new CliBuilder(usage: "superstrings <filepath>")
 cli.with {
     h longOpt: 'help', "show usage information"
+    r longOpt: 'retranslate', 'force retranslation of all resources, regardless of existing translations in cache file'
     g longOpt: 'google-api-key', args: 1, argName: 'key', 'use google translate with specified API key'
 }
 def options = cli.parse(args);
@@ -41,6 +42,12 @@ if (!(file.exists() && file.canRead())) {
     println "Unable to access file: ${file.absolutePath}"
     return
 }
+// parse other command line arguments
+def retranslate = options.r ? options.r as Boolean : false
+if (retranslate) {
+    println 'Found -r option. All resources will be retranslated'
+}
+
 // parse resources
 def parser = new AndroidXmlParser()
 
@@ -107,6 +114,9 @@ resources.each { StringResource resource ->
 // generate translation directives
 def translations = resources.collect { StringResource resource ->
     targetLanguages.findAll { Language targetLanguage ->
+        if (retranslate) {
+            return true
+        }
         !resource.translations.any { it.language == targetLanguage }
     }.collect {
         new Translation(resource: resource, targetLanguage: it)
@@ -170,7 +180,23 @@ for (int i = 0; i < translations.size(); i++) {
             resourceToUpdate = item.resource.clone() as StringResource
             translatedResources << resourceToUpdate
         }
-        resourceToUpdate.translations << translation
+        boolean updateTranslation = true
+        if (retranslate) {
+            def existingTranslation = resourceToUpdate.translations.find {
+                it.language == translation.language
+            }
+            if (existingTranslation) {
+                if (existingTranslation.translatedValue == translation.translatedValue) {
+                    println 'Retranslated value matches existing translation; Skip updating this resource'
+                    updateTranslation = false
+                } else {
+                    resourceToUpdate.translations.remove(existingTranslation)
+                }
+            }
+        }
+        if (updateTranslation) {
+            resourceToUpdate.translations << translation
+        }
         try {
             def sortedOutput = translatedResources.sort() { StringResource left, StringResource right ->
                 left.id <=> right.id
