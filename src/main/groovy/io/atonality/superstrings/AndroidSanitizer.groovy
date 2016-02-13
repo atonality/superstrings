@@ -30,6 +30,7 @@ class AndroidSanitizer extends JavaSanitizer {
             value = value.replace("'", "\\'")
             value = value.replace('"', '\\"')
         }
+        value = value.replaceAll('\\.\\.\\.', '…')
         return value
     }
 }
