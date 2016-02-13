@@ -70,9 +70,9 @@ class Sanitizer {
             char pre = result.resource.value.charAt(0)
             char post = value.charAt(0)
 
-            if (Character.isUpperCase(pre) && !Character.isUpperCase(post)) {
+            if (Character.isLetter(post) && Character.isUpperCase(pre) && !Character.isUpperCase(post)) {
                 value = value.replaceFirst(post as String, post.toUpperCase() as String)
-            } else if (Character.isLowerCase(pre) && !Character.isLowerCase(pre)) {
+            } else if (Character.isLetter(post) && Character.isLowerCase(pre) && !Character.isLowerCase(pre)) {
                 value = value.replaceFirst(post as String, post.toLowerCase() as String)
             }
         }
