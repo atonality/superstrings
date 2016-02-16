@@ -48,6 +48,7 @@ List<String> stringsArgList = null
 def stringsArg = options.s ? options.s as String : null
 if (stringsArg) {
     stringsArgList = stringsArg.split(',').collect { it.trim() }
+    println "Found -s option. Only translating resources with ids: ${stringsArgList.toListString()}"
 }
 def retranslate = options.r ? options.r as Boolean : false
 if (retranslate) {
