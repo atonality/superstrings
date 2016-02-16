@@ -17,7 +17,8 @@ import java.text.NumberFormat
 // -d dry run
 def cli = new CliBuilder(usage: "superstrings <filepath>")
 cli.with {
-    h longOpt: 'help', "show usage information"
+    h longOpt: 'help', 'show usage information'
+    s longOpt: 'strings', args: 1, argName: 'ids', 'list of string resource IDs to translate, separated by ","'
     r longOpt: 'retranslate', 'force retranslation of all resources, regardless of existing translations in cache file'
     g longOpt: 'google-api-key', args: 1, argName: 'key', 'use google translate with specified API key'
 }
@@ -43,6 +44,11 @@ if (!(file.exists() && file.canRead())) {
     return
 }
 // parse other command line arguments
+List<String> stringsArgList = null
+def stringsArg = options.s ? options.s as String : null
+if (stringsArg) {
+    stringsArgList = stringsArg.split(',').collect { it.trim() }
+}
 def retranslate = options.r ? options.r as Boolean : false
 if (retranslate) {
     println 'Found -r option. All resources will be retranslated'
@@ -122,6 +128,11 @@ def translations = resources.collect { StringResource resource ->
         new Translation(resource: resource, targetLanguage: it)
     }
 }.flatten() as List<Translation>
+if (stringsArgList != null) {
+    translations.removeAll { Translation translation ->
+        !(translation.resource.id in stringsArgList)
+    }
+}
 
 // print items to be translated / ask if user is ready to translate
 def translator = new GoogleTranslator(googleApiKey, sourceLanguage)
