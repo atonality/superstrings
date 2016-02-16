@@ -4,7 +4,6 @@ import groovy.transform.CompileStatic
 
 import java.util.regex.Pattern
 
-// TODO: matching case of first character may fail if the first character is a "?" or other punctuation char
 // TODO: replace w/ mapping does not replace w/ proper case
 @CompileStatic
 class Sanitizer {
@@ -37,11 +36,16 @@ class Sanitizer {
         def properNames = [] as Set<String>
         properNames += metadata.properNames
         properNames += (resource.metadata['properNames'] ?: []) as Set<String>
-
+        properNames = properNames.toList().sort { String left, String right ->
+            right.length() <=> left.length()
+        }
         def result = [] as List<String>
+        String clonedValue = new String(resource.value)
+
         properNames.each { String name ->
             def pattern = Pattern.compile("\\b${name}\\b", Pattern.CASE_INSENSITIVE)
-            result += resource.value.findAll(pattern)
+            result += clonedValue.findAll(pattern)
+            clonedValue = clonedValue.replaceAll(pattern, '')
         }
         return result
     }
