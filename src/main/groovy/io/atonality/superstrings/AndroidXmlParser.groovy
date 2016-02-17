@@ -42,9 +42,13 @@ class AndroidXmlParser extends FileParser {
             if (id?.isEmpty() || value?.isEmpty()) {
                 return null
             }
-            def translatableAttr = node.attributes()['translatable'] as String
-            boolean translatable = translatableAttr ? Boolean.valueOf(translatableAttr) : true
-
+            boolean translatable = true
+            ['translatable', SuperstringsNamespace.TranslatableAttr].each {
+                // either 'translatable'=> false or 'superstrings:translatable'=> false results
+                // disabled translation. translation is enabled by default.
+                def translatableAttr = node.attributes()['translatable'] as String
+                translatable &= (translatableAttr ? Boolean.valueOf(translatableAttr) : true)
+            }
             def valueAttr = node.attributes()[SuperstringsNamespace.ValueAttr] as String
             if (valueAttr != null && !valueAttr.isEmpty()) {
                 value = valueAttr
