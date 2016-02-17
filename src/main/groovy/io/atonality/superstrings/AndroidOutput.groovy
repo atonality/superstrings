@@ -2,9 +2,16 @@ package io.atonality.superstrings
 
 import groovy.xml.MarkupBuilder
 
-class AndroidOutput {
+class AndroidOutput implements Output {
 
-    File getCacheFile(File inputFile) {
+    final File inputFile
+
+    AndroidOutput(File inputFile) {
+        this.inputFile = inputFile
+    }
+
+    @Override
+    File getCacheFile() {
         File file = inputFile
         while (file.getName() != 'src') {
             file = file.getParentFile()
@@ -20,7 +27,8 @@ class AndroidOutput {
         return new File(file, "${inputFile.name}.superstrings")
     }
 
-    Tuple writeTranslations(Set<StringResource> translatedResources, Language targetLanguage, File inputFile) throws IOException {
+    @Override
+    String outputTranslations(Set<StringResource> translatedResources, Language targetLanguage) throws IOException {
         // filter and sort resources
         translatedResources = translatedResources.findAll { StringResource resource ->
             def translation = resource.translations.find { it.language == targetLanguage }
@@ -54,6 +62,12 @@ class AndroidOutput {
                 }
             }
         }
-        return [outputFile, translatedResources]
+        return "Successfully wrote ${translatedResources.size()} resources to file: ${outputFile.absolutePath}"
     }
+
+    @Override
+    void onResourcesParsed(List<StringResource> resources) {}
+
+    @Override
+    void finish() {}
 }

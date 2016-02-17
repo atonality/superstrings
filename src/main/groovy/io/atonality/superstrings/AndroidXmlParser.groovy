@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import groovy.util.slurpersupport.Node
 
 @CompileStatic
-class AndroidXmlParser implements FileParser {
+class AndroidXmlParser extends FileParser {
 
     @Override
     SuperstringsMetadata parseMetadata(File file) throws RuntimeException {
@@ -66,21 +66,5 @@ class AndroidXmlParser implements FileParser {
         } as List<StringResource>
         resources.removeAll { it == null }
         return resources
-    }
-
-    protected Set<String> parseProperNames(String properNamesAttr) {
-        properNamesAttr.split('\\|').toList().collect() { it.trim() }
-                .findAll { !it.isEmpty() }.toSet()
-    }
-
-    protected Map<String, String> parseMapping(String mappingAttr) {
-        def result = [:]
-        mappingAttr.split('\\|').toList().each {
-            def attrs = it.split(':')
-            if (attrs.length == 2) {
-                result[attrs[0]] = attrs[1]
-            }
-        }
-        return result
     }
 }

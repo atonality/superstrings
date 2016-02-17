@@ -4,7 +4,7 @@ import com.google.gson.reflect.TypeToken
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class JsonParser implements FileParser {
+class JsonFileParser extends FileParser {
 
     @Override
     List<StringResource> parse(File file) {
