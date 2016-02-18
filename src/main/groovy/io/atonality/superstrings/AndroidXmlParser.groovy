@@ -46,7 +46,7 @@ class AndroidXmlParser extends FileParser {
             ['translatable', SuperstringsNamespace.TranslatableAttr].each {
                 // either 'translatable'=> false or 'superstrings:translatable'=> false results
                 // disabled translation. translation is enabled by default.
-                def translatableAttr = node.attributes()['translatable'] as String
+                def translatableAttr = node.attributes()[it] as String
                 translatable &= (translatableAttr ? Boolean.valueOf(translatableAttr) : true)
             }
             def valueAttr = node.attributes()[SuperstringsNamespace.ValueAttr] as String
