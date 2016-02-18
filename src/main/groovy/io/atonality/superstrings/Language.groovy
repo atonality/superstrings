@@ -37,4 +37,12 @@ enum Language {
         this.isoCode = isoCode
         this.googlePlayCode = googlePlayCode
     }
+
+    static Language tryParse(String value) {
+        try {
+            return valueOf(value)
+        } catch (IllegalArgumentException ex) {
+            return null
+        }
+    }
 }

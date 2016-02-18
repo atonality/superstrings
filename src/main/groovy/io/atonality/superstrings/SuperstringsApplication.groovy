@@ -2,15 +2,14 @@ package io.atonality.superstrings
 
 import java.text.NumberFormat
 
-// TODO: parse superstrings namespace in .xml properly
 // TODO: package as jar / runnable application
 // TODO: documentation
-// TODO: add invalidation commands: by id, by language or all
+// TODO: parse superstrings namespace in .xml properly
 // TODO: display progress while translating / submitting output
+// TODO: add invalidation commands: by id, by language or all
 
 // TODO: add parameters and options
-// -l input language
-// -i target language
+// -i input language
 // -e exclude language
 // -f input file format (Android, etc)
 // -c cache file location
@@ -30,6 +29,7 @@ cli.with {
 
     // optional arguments
     s longOpt: 'strings', args: 1, argName: 'ids', 'list of string resource IDs to translate, separated by ","'
+    l longOpt: 'languages', args: 1, argName: 'names', 'list of language names, separated by ","'
     r longOpt: 'retranslate', 'force retranslation of all resources, regardless of existing translations in cache file'
     n longOpt: 'disable-translation', 'skip translation; update outputs only'
 }
@@ -93,6 +93,12 @@ def stringsArg = options.s ? options.s as String : null
 if (stringsArg) {
     stringsArgList = stringsArg.split(',').collect { it.trim() }
     println "Found -s option. Only translating resources with ids: ${stringsArgList.toListString()}"
+}
+Set<Language> targetLanguages = null
+def targetLanguagesArg = options.l ? options.l as String : null
+if (targetLanguagesArg) {
+    targetLanguages = targetLanguagesArg.split(',').collect { Language.tryParse(it) }.findAll { it != null }.toSet()
+    println "Found -l option. Target languages: ${targetLanguages.toListString()}"
 }
 def retranslate = options.r ? options.r as Boolean : false
 if (retranslate) {
@@ -184,8 +190,10 @@ if (cacheFile.exists() && cacheFile.canRead()) {
 }
 long timeoutMs = 1000L * 60L * 60L * 24L * 90L // 90 days
 def sourceLanguage = Language.English
-def targetLanguages = Language.values().toList().toSet()
-targetLanguages.remove(sourceLanguage)
+if (!targetLanguages) {
+    targetLanguages = Language.values().toList().toSet();
+    targetLanguages.remove(sourceLanguage)
+}
 
 // remove stale translations
 resources.each { StringResource resource ->
