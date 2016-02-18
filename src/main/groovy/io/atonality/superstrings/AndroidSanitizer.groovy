@@ -2,11 +2,21 @@ package io.atonality.superstrings
 
 import groovy.transform.CompileStatic
 
+import java.util.regex.Pattern
+
 @CompileStatic
 class AndroidSanitizer extends JavaSanitizer {
 
+    static final String SINGLE_QUOTE_REGEX = '\'|&#39;'
+    static final String DOUBLE_QUOTE_REGEX = '"|&#34;'
+
+    final Pattern singleQuotePattern
+    final Pattern doubleQuotePattern
+
     def AndroidSanitizer(SuperstringsMetadata metadata) {
         super(metadata)
+        singleQuotePattern = Pattern.compile(SINGLE_QUOTE_REGEX)
+        doubleQuotePattern = Pattern.compile(DOUBLE_QUOTE_REGEX)
     }
 
     @Override
@@ -27,8 +37,12 @@ class AndroidSanitizer extends JavaSanitizer {
         if (cdata) {
             value = "<![CDATA[${value}]]>"
         } else {
-            value = value.replace("'", "\\'")
-            value = value.replace('"', '\\"')
+            value.findAll(singleQuotePattern).each { String match ->
+                value = value.replace(match, "\\'")
+            }
+            value.findAll(doubleQuotePattern).each { String match ->
+                value = value.replace(match, '\\"')
+            }
         }
         value = value.replaceAll('\\.\\.\\.', '…')
         return value

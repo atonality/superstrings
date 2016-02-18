@@ -54,11 +54,7 @@ class AndroidOutput implements Output {
             translatedResources.each { StringResource resource ->
                 def translation = resource.translations.find { it.language == targetLanguage }
                 xml.string(name: resource.id) {
-                    if (resource.metadata['cdata'] == true) {
-                        xml.mkp.yieldUnescaped(translation.translatedValue)
-                    } else {
-                        xml.mkp.yield(translation.translatedValue)
-                    }
+                    xml.mkp.yieldUnescaped(translation.translatedValue)
                 }
             }
         }

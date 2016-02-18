@@ -2,6 +2,8 @@ package io.atonality.superstrings
 
 import java.text.NumberFormat
 
+// TODO: store unsanitized value in cache file, and always re-sanitize before writing.
+//       this allows refactoring the sanitizer without requiring retranslation of resources
 // TODO: package as jar / runnable application
 // TODO: documentation
 // TODO: parse superstrings namespace in .xml properly
@@ -28,8 +30,8 @@ cli.with {
     k longOpt: 'private-key', args: 1, argName: 'filepath', 'google play service account private key file (required if --format="googlePlay")'
 
     // optional arguments
-    s longOpt: 'strings', args: 1, argName: 'ids', 'list of string resource IDs to translate, separated by ","'
-    l longOpt: 'languages', args: 1, argName: 'names', 'list of language names, separated by ","'
+    s longOpt: 'strings', args: 1, argName: 'ids', 'list of string resource IDs to translate, separated by "|"'
+    l longOpt: 'languages', args: 1, argName: 'names', 'list of language names, separated by "|"'
     r longOpt: 'retranslate', 'force retranslation of all resources, regardless of existing translations in cache file'
     n longOpt: 'disable-translation', 'skip translation; update outputs only'
 }
@@ -91,13 +93,13 @@ if (format == IoFormat.GooglePlay) {
 List<String> stringsArgList = null
 def stringsArg = options.s ? options.s as String : null
 if (stringsArg) {
-    stringsArgList = stringsArg.split(',').collect { it.trim() }
+    stringsArgList = stringsArg.split('\\|').collect { it.trim() }
     println "Found -s option. Only translating resources with ids: ${stringsArgList.toListString()}"
 }
 Set<Language> targetLanguages = null
 def targetLanguagesArg = options.l ? options.l as String : null
 if (targetLanguagesArg) {
-    targetLanguages = targetLanguagesArg.split(',').collect { Language.tryParse(it) }.findAll { it != null }.toSet()
+    targetLanguages = targetLanguagesArg.split('\\|').collect { Language.tryParse(it) }.findAll { it != null }.toSet()
     println "Found -l option. Target languages: ${targetLanguages.toListString()}"
 }
 def retranslate = options.r ? options.r as Boolean : false
