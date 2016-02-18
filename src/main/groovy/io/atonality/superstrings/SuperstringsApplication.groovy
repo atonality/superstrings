@@ -2,7 +2,6 @@ package io.atonality.superstrings
 
 import java.text.NumberFormat
 
-// TODO: remove stale translations from cache file when original resource value is modified
 // TODO: parse superstrings namespace in .xml properly
 // TODO: package as jar / runnable application
 // TODO: documentation
@@ -164,6 +163,12 @@ cacheFile.getParentFile().mkdirs()
 if (cacheFile.exists() && cacheFile.canRead()) {
     try {
         def cachedResources = new JsonFileParser().parse(cacheFile)
+
+        // remove cached resources which no longer exist in the input file (by value, not id)
+        cachedResources.removeAll { StringResource resource ->
+            !resources.any { it.value == resource.value }
+        }
+        // update input resources with existing translations from cache file (again, by value)
         resources.each { StringResource resource ->
             def cachedValue = cachedResources.find { resource.value == it.value }
             resource.translations = cachedValue?.translations ?: []
@@ -288,29 +293,34 @@ for (int i = 0; i < translations.size(); i++) {
         if (updateTranslation) {
             resourceToUpdate.translations << translation
         }
-        try {
-            def sortedOutput = translatedResources.sort() { StringResource left, StringResource right ->
-                left.id <=> right.id
-            }
-            sortedOutput.each {
-                it.translations.sort(true) { TranslationResult left, TranslationResult right ->
-                    left.language <=> right.language
-                }
-            }
-            def json = SerializationUtil.newGsonInstance().toJson(sortedOutput)
-            cacheFile.withWriter { it << json }
-            println "Cache file updated successfully"
-        } catch (IOException ex) {
-            println "Failed to update cache file"
-            ex.printStackTrace()
-            return
-        }
+        updateCacheFile(cacheFile, translatedResources)
     } catch (IOException ex) {
         failedCount++
         println "Translation failed"
         ex.printStackTrace()
     }
     println()
+}
+if (translations.isEmpty()) {
+    updateCacheFile(cacheFile, translatedResources)
+}
+def updateCacheFile(File cacheFile, Set<StringResource> translatedResources) {
+    try {
+        def sortedOutput = translatedResources.sort() { StringResource left, StringResource right ->
+            left.id <=> right.id
+        }
+        sortedOutput.each {
+            it.translations.sort(true) { TranslationResult left, TranslationResult right ->
+                left.language <=> right.language
+            }
+        }
+        def json = SerializationUtil.newGsonInstance().toJson(sortedOutput)
+        cacheFile.withWriter { it << json }
+        println "Cache file updated successfully"
+    } catch (IOException ex) {
+        println "Failed to update cache file"
+        ex.printStackTrace()
+    }
 }
 
 println()
