@@ -1,0 +1,2 @@
+#!/bin/bash
+groovy -cp ./superstrings.jar ./Superstrings.groovy $@

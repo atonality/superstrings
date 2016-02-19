@@ -4,7 +4,6 @@ import java.text.NumberFormat
 
 // TODO: store unsanitized value in cache file, and always re-sanitize before writing.
 //       this allows refactoring the sanitizer without requiring retranslation of resources
-// TODO: package as jar / runnable application
 // TODO: documentation
 // TODO: parse superstrings namespace in .xml properly
 // TODO: display progress while translating / submitting output
