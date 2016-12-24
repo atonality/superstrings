@@ -2,6 +2,9 @@ package io.atonality.superstrings
 
 import java.text.NumberFormat
 
+// TODO [bug]: example proper names which fail: "{artistLink}" <-- this is used as a faux string format in the TM app
+// TODO [enhancement]: ignore proper names inside of url's. eg properNames="...|Google|...", and a string resources contains "Google.com"
+
 // TODO: store unsanitized value in cache file, and always re-sanitize before writing.
 //       this allows refactoring the sanitizer without requiring retranslation of resources
 // TODO: documentation
