@@ -1,2 +1,3 @@
-#!/bin/bash
-groovy -cp ./superstrings.jar ./Superstrings.groovy $@
+#!/usr/bin/env bash
+SCRIPT_DIR=`dirname $0`
+groovy -cp ${SCRIPT_DIR}/superstrings.jar ${SCRIPT_DIR}/Superstrings.groovy $@
